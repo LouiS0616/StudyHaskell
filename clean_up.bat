@@ -2,5 +2,8 @@
 setlocal
 
 pushd "%~dp0"
-del *~
+    del *~
+    del *.hi
+    del *.o
+    del *.exe
 popd

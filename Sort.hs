@@ -1,3 +1,6 @@
+import Debug.Trace
+
+
 --
 --
 -- Insert Sort
@@ -38,12 +41,38 @@ bsort2 xs = y : bsort2 ys
 
 --
 --
--- Marge Sort
+-- Merge Sort
+merge [] ys = ys
+merge xs [] = xs
 
+merge (x:xs) (y:ys)
+    | x < y     = x : merge    xs (y:ys)
+    | otherwise = y : merge (x:xs)   ys
 
+msort [x] = [x]
+msort xs  = merge left right
+    where
+        left  = msort $ take n xs
+        right = msort $ drop n xs
+        n = (length xs) `div` 2         -- ®”œŽZ‚Ì‚½‚ß‚Ìdiv
+
+--
+--
+-- Quick Sort
+qsort []     = []
+qsort (x:xs) = left ++ [axis] ++ right
+    where
+        axis  = x
+        left  = qsort [e | e <- xs, e <  axis]
+        right = qsort [e | e <- xs, e >= axis]
+
+--
+--
 main = do
     let list = [4, 6, 9, 8, 3, 5, 1, 7, 2]
 
     print $ isort  list
     print $ bsort1 list
     print $ bsort2 list
+    print $ msort  list
+    print $ qsort  list
