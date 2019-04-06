@@ -1,32 +1,49 @@
+--
+--
 -- Insert Sort
 insert x []     = [x]
 insert x (y:ys)
     | x < y     = x : y : ys
     | otherwise = y : insert x ys
 
-isort []        = []
-isort (x:xs)    = insert x (isort xs)
+isort []     = []
+isort (x:xs) = insert x (isort xs)
 
+--
+--
 -- Bubble Sort
 isSorted (x:y:zs)
     | x > y     = False
     | zs == []  = x < y
     | otherwise = isSorted (y:zs)
 
+-- ˆê”Ô¬‚³‚È”‚ðæ“ª‚ÉŽ‚Á‚Ä‚­‚é
 bswap [x]   = [x]
-bswap (x:y:zs)
-    | x > y     = y : bswap (x:zs)
-    | otherwise = x : bswap (y:zs)
+bswap (x:ys)
+    | x < y     = x:y:zs
+    | otherwise = y:x:zs
+    where
+        (y:zs) = bswap ys
 
-bsort list
+-- “ÆŽ©ŽÀ‘•
+bsort1 list
     | isSorted list = list
-    | otherwise     = bsort $ bswap list
+    | otherwise     = bsort1 $ bswap list
 
+-- 7shiŽ‚ÌŽÀ‘•
+bsort2 [] = []
+bsort2 xs = y : bsort2 ys
+    where
+        (y:ys) = bswap xs
+
+--
+--
 -- Marge Sort
 
 
 main = do
     let list = [4, 6, 9, 8, 3, 5, 1, 7, 2]
 
-    print $ isort list
-    print $ bsort list
+    print $ isort  list
+    print $ bsort1 list
+    print $ bsort2 list
