@@ -1,6 +1,3 @@
-import Debug.Trace
-
-
 --
 --
 -- Insert Sort
