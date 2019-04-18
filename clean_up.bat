@@ -20,6 +20,7 @@ pushd %work_dir%
     del *.hi
     del *.o
     del *.exe
+    del a.out
 
 :ESCAPE
 popd
