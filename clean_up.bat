@@ -5,15 +5,15 @@ setlocal
 :: https://qiita.com/sawa_tsuka/items/8edf3d3d33a0ae86cb5c
 
 if "%1"=="" (
-    set work_dir=.
+    set work_dir=%cd%
 
 ) else (
     set work_dir=%~f1
 )
 
 pushd %work_dir%
-    if not %cd% == %work_dir% (
-        goto :EOF
+    if not "%cd%" == "%work_dir%" (
+        goto :ESCAPE
     )
 
     del *~
@@ -21,4 +21,5 @@ pushd %work_dir%
     del *.o
     del *.exe
 
+:ESCAPE
 popd
