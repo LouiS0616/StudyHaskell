@@ -1,13 +1,17 @@
 --
+_cycle' :: [a] -> [a] -> [a]
 _cycle' src [] = _cycle' src src
 _cycle' src (x:xs) = x: _cycle' src xs
 
+cycle' :: [a] -> [a]
 cycle' src = _cycle' src []
 
 --
+repeat' :: a -> [a]
 repeat' e = e: repeat' e
 
 --
+replicate' :: Int -> a -> [a]
 replicate' 0 _ = []
 replicate' n e = e: replicate' (n-1) e
 
@@ -40,14 +44,14 @@ main = do
         lst = [3, 1, 4] :: [Int]
         putLine = putStrLn ""
 
-    putStrLn $ showWithTag32 "cycle: "   (take 10 (cycle  lst))
-    putStrLn $ showWithTag32 "cycle': "  (take 10 (cycle' lst))
+    putStrLn $ showWithTag32 "cycle: "   (take (10::Int) (cycle  lst))
+    putStrLn $ showWithTag32 "cycle': "  (take (10::Int) (cycle' lst))
     putLine
 
-    putStrLn $ showWithTag32 "repeat: "  (take 10 (repeat  3))
-    putStrLn $ showWithTag32 "repeat': " (take 10 (repeat' 3))
+    putStrLn $ showWithTag32 "repeat: "  (take (10::Int) (repeat  (3::Int)))
+    putStrLn $ showWithTag32 "repeat': " (take (10::Int) (repeat' (3::Int)))
     putLine
 
-    putStrLn $ showWithTag32 "replicate: "  (replicate  7 4)
-    putStrLn $ showWithTag32 "replicate': " (replicate' 7 4)
+    putStrLn $ showWithTag32 "replicate: "  (replicate  (7::Int) (4::Int))
+    putStrLn $ showWithTag32 "replicate': " (replicate' (7::Int) (4::Int))
     putLine
