@@ -1,10 +1,13 @@
 --
-_cycle' :: [a] -> [a] -> [a]
-_cycle' src [] = _cycle' src src
-_cycle' src (x:xs) = x: _cycle' src xs
+_cycle1' :: [a] -> [a] -> [a]
+_cycle1' src []     = _cycle1' src src
+_cycle1' src (x:xs) = x: _cycle1' src xs
 
-cycle' :: [a] -> [a]
-cycle' src = _cycle' src []
+cycle1' :: [a] -> [a]
+cycle1' src = _cycle1' src []
+
+cycle2' :: [a] -> [a]
+cycle2' lst = concat (lst: [cycle2' lst])
 
 --
 repeat' :: a -> [a]
@@ -12,8 +15,10 @@ repeat' e = e: repeat' e
 
 --
 replicate' :: Int -> a -> [a]
-replicate' 0 _ = []
-replicate' n e = e: replicate' (n-1) e
+replicate' n e
+    | n  < 0    = error "negative value"
+    | n == 0    = []
+    | otherwise = e: replicate' (n-1) e
 
 
 --
@@ -44,8 +49,9 @@ main = do
         lst = [3, 1, 4] :: [Int]
         putLine = putStrLn ""
 
-    putStrLn $ showWithTag32 "cycle: "   (take (10::Int) (cycle  lst))
-    putStrLn $ showWithTag32 "cycle': "  (take (10::Int) (cycle' lst))
+    putStrLn $ showWithTag32 "cycle: "    (take (10::Int) (cycle   lst))
+    putStrLn $ showWithTag32 "cycle1': "  (take (10::Int) (cycle1' lst))
+    putStrLn $ showWithTag32 "cycle2': "  (take (10::Int) (cycle2' lst))
     putLine
 
     putStrLn $ showWithTag32 "repeat: "  (take (10::Int) (repeat  (3::Int)))
