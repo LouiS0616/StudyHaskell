@@ -64,6 +64,20 @@ caesarShift' 0 = id
 caesarShift' n = map (shiftOrd' n)
 
 --
+digits' :: Int -> Int -> [Int]
+digits' _ 0 = []
+digits' base num = digits' base quotient ++ [remainder]
+    where
+        (quotient, remainder) = divMod num base
+
+fromDigits1' :: Int -> [Int] -> Int
+fromDigits1' _ [] = 0 
+fromDigits1' base dgts = last dgts + fromDigits1' base (map (* base) . init $ dgts)
+
+fromDigits2' :: Int -> [Int] -> Int
+fromDigits2' base = foldl1 (\acc dgt -> base * acc + dgt)
+
+--
 main :: IO()
 main = do
     let
@@ -94,4 +108,12 @@ main = do
     putStrLn $ caesarShift'   1  "hoge"     -- iphf
 
     print $ caesarShift' 10 arr             -- [13,11,14,11,15,19,12]
+
+    -- ‚©‚Á‚±‚¢‚¢”‚ğŒ©‚Â‚¯‚æ‚¤
+    print $ digits' 10 3141592      -- [3,1,4,1,5,9,2]
+    print $ fromDigits1' 10 arr     -- 3141592
+    print $ fromDigits2' 10 arr     -- 3141592
+
+    print $ head (filter (\dgts -> sum (digits' 10 dgts) == 40) [1..])  -- 49999
+    print $ head $ filter ((== 40) . sum . digits' 10) [1..]            -- 49999
 
