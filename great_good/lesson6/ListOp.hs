@@ -55,11 +55,12 @@ tails' arr = arr: tails' (tail arr)
 
 --
 shiftOrd' :: (Enum a) => Int -> a -> a
-shiftOrd' n src
+shiftOrd' n src 
     | 0 <= n    = iterate succ src !!   n
     | otherwise = iterate pred src !! (-n)
 
 caesarShift' :: (Enum a) => Int -> [a] -> [a]
+caesarShift' 0 = id
 caesarShift' n = map (shiftOrd' n)
 
 --
@@ -88,5 +89,9 @@ main = do
     print $ (tails' . take 5) arr       -- [[3,1,4,1,5],[1,4,1,5],[4,1,5],[1,5],[5],[]]
     
     -- シーザー暗号サラダ
-    putStrLn $ caesarShift'   1  "hoge"
-    putStrLn $ caesarShift' (-1) "hoge"
+    putStrLn $ caesarShift' (-1) "hoge"     -- gnfd
+    putStrLn $ caesarShift'   0  "hoge"     -- hoge
+    putStrLn $ caesarShift'   1  "hoge"     -- iphf
+
+    print $ caesarShift' 10 arr             -- [13,11,14,11,15,19,12]
+
