@@ -1,8 +1,14 @@
-import qualified Shape
+import Shape
 
 main :: IO()
 main = do
-    print $ Shape.area (Shape.Circle 10)
-    print $ Shape.area (Shape.Rectangle 10 20)
+    let
+        circle = Circle {radius=10} :: Shape
 
-    print $ Shape.Square 10
+    print $ area circle
+    print $ radius circle
+
+    print $ area (Rectangle {height=10, width=20})
+
+    print $ Square 10
+
