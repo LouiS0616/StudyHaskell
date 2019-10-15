@@ -50,7 +50,7 @@ popMaxNode (Node n lh rh)    = (poppedNode, Node n lh newTree)
 
 
 fromList :: (Ord a) => [a] -> BinarySearchTree a
-fromList = foldr (..>) Empty
+fromList = foldl (flip (..>)) Empty
 
 member :: (Ord a) => a -> BinarySearchTree a -> Bool
 _ `member` Empty = False

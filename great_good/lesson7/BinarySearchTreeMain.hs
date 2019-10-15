@@ -6,7 +6,7 @@ main :: IO()
 main = do
     let
         arr = [3, 1, 4, 1, 5, 9, 2] :: [Int]
-        tree = fromList . reverse $ arr
+        tree = fromList arr
 
     print $ 5 `member` tree     -- True
     print $ 8 `member` tree     -- False
