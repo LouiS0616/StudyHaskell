@@ -7,7 +7,6 @@ data BinaryHeapTree a
     = Empty
     | Node { 
             node::a, 
-            parent::BinaryHeapTree a, 
             left::BinaryHeapTree a, right::BinaryHeapTree a
         }   
     deriving (Eq)
@@ -19,16 +18,16 @@ instance (Show a) => Show (BinaryHeapTree a) where
 --
 isSaturated :: BinaryHeapTree a -> Bool
 isSaturated Empty = True
-isSaturated (Node _ _ lh rh)
+isSaturated (Node _ lh rh)
     = isSaturated lh && isSaturated rh && height lh == height rh
 
 height :: BinaryHeapTree a -> Int
-height Empty            = 0
-height (Node _ _ lh rh) = 1 + max (height lh) (height rh)
+height Empty          = 0
+height (Node _ lh rh) = 1 + max (height lh) (height rh)
 
 lastNode :: (Eq a) => BinaryHeapTree a -> BinaryHeapTree a
 lastNode Empty = error "empty tree!"
-lastNode tree@(Node _ _ lh rh)
+lastNode tree@(Node _ lh rh)
     | lh == Empty            = tree
     | height lh == height rh = lastNode rh
     | otherwise              = lastNode lh
@@ -55,17 +54,13 @@ fromList = foldl (flip (..>)) Empty
 --
 putAtLast :: (Eq a) => a -> BinaryHeapTree a -> BinaryHeapTree a
 putAtLast d Empty 
-                        = Node d Empty Empty Empty
-putAtLast d tree@(Node n p lh Empty)
-    | lh == Empty       = Node n p (makeLeaf d tree)            Empty
-    | otherwise         = Node n p               lh  (makeLeaf d tree)
-    where
-        makeLeaf :: a -> BinaryHeapTree a -> BinaryHeapTree a
-        makeLeaf n' p' = Node n' p' Empty Empty
-putAtLast d tree@(Node n p lh rh) 
-    | isSaturated tree  = Node n p (putAtLast d lh)                rh 
-    | isSaturated lh    = Node n p              lh    (putAtLast d rh)
-    | otherwise         = Node n p (putAtLast d lh)                rh 
+                        = Node d Empty Empty
+putAtLast d tree@(Node n lh rh) 
+    | lh == Empty       = Node n (Node d Empty Empty)               Empty
+    | rh == Empty       = Node n                  lh  (Node d Empty Empty)
+    | isSaturated tree  = Node n     (putAtLast d lh)                  rh 
+    | isSaturated lh    = Node n                  lh      (putAtLast d rh)
+    | otherwise         = Node n     (putAtLast d lh)                  rh 
 
 --upHeap :: (Ord a) => BinaryHeapTree a -> BinaryHeapTree a
 --upHeap Empty = Empty
@@ -86,15 +81,10 @@ putAtLast d tree@(Node n p lh rh)
 --
 toStr :: (Show a) => Int -> BinaryHeapTree a -> String
 toStr _ Empty = "Empty"
-toStr d (Node n Empty lh rh)
-    = "Root { node = " ++ show n ++ ", parent = x\n"
-    ++ indent d ++ "left  = " ++ toStr (d+1) lh ++ ",\n" 
-    ++ indent d ++ "right = " ++ toStr (d+1) rh ++  "\n"
-    ++ indent (d-1) ++ "}"
-toStr _ (Node n _ Empty Empty) 
-    = "Leaf { node = " ++ show n ++ ", parent = ... }"
-toStr d (Node n _ lh rh) 
-    = "Node { node = " ++ show n ++ ", parent = ...,\n"
+toStr _ (Node n Empty Empty) 
+    = "Leaf { node = " ++ show n ++ "}"
+toStr d (Node n lh rh) 
+    = "Node { node = " ++ show n ++ ",\n"
     ++ indent d ++ "left  = " ++ toStr (d+1) lh ++ ",\n" 
     ++ indent d ++ "right = " ++ toStr (d+1) rh ++  "\n"
     ++ indent (d-1) ++ "}"
