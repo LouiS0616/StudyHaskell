@@ -36,6 +36,13 @@ directionsTowardLastNode (Node _ lh rh)
     | height lh == height rh = RightDir: directionsTowardLastNode rh
     | otherwise              = LeftDir : directionsTowardLastNode lh
 
+lastNode :: (Eq a) => BinaryHeapTree a -> BinaryHeapTree a
+lastNode tree = follow tree (directionsTowardLastNode tree)
+    where
+        follow tree [] = tree
+        follow (Node _ lh  _) (LeftDir :ds) = follow lh ds
+        follow (Node _  _ rh) (RightDir:ds) = follow rh ds
+
 
 --
 (..>) :: (Ord a) => a -> BinaryHeapTree a -> BinaryHeapTree a
@@ -46,6 +53,12 @@ d ..> tree = upHeap newTree (directionsTowardLastNode newTree)
 fromList :: (Ord a) => [a] -> BinaryHeapTree a
 fromList = foldl (flip (..>)) Empty
 
+--pop :: (Ord a) => BinaryHeapTree a -> (a, BinaryHeapTree a)
+--pop tree@(Node n lh rh) = (n, newTree)
+--    where 
+--        newTree = downHeap $ (Node (node . lastNode $ tree) lh rh)
+
+-- popLastNode‚ª•K—v‚¶‚á‚È‚¢‚©H
 
 --
 putAtLast :: (Eq a) => a -> BinaryHeapTree a -> BinaryHeapTree a
@@ -66,6 +79,17 @@ upHeap (Node n lh rh) (RightDir:ds)
     | n <= node rh  = Node        n  lh (upHeap    rh ds)
     | otherwise     = Node (node rh) lh (upHeap newRh ds) where newRh = Node n (left rh) (right rh)
 upHeap _ _ = error "illegal op"
+
+downHeap :: (Ord a) => BinaryHeapTree a -> BinaryHeapTree a
+downHeap tree@(Node n lh rh)
+    | lh == Empty = tree
+    | node lh < n = Node (node lh) (downHeap newLh)              rh 
+    | rh == Empty = tree
+    | node rh < n = Node (node rh)              lh  (downHeap newRh) 
+    | otherwise   = tree
+    where
+        newLh = Node n (left lh) (right lh)
+        newRh = Node n (left rh) (right rh)
 
 
 --
