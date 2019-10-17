@@ -1,5 +1,7 @@
 module BinaryHeapTree (
-        fromList
+        fromList, popAll,
+        (..>), pop,
+        heapSort
     ) where
 
 
@@ -36,13 +38,6 @@ directionsTowardLastNode (Node _ lh rh)
     | height lh == height rh = RightDir: directionsTowardLastNode rh
     | otherwise              = LeftDir : directionsTowardLastNode lh
 
-lastNode :: (Eq a) => BinaryHeapTree a -> BinaryHeapTree a
-lastNode tree = follow tree (directionsTowardLastNode tree)
-    where
-        follow tree [] = tree
-        follow (Node _ lh  _) (LeftDir :ds) = follow lh ds
-        follow (Node _  _ rh) (RightDir:ds) = follow rh ds
-
 
 --
 (..>) :: (Ord a) => a -> BinaryHeapTree a -> BinaryHeapTree a
@@ -53,12 +48,20 @@ d ..> tree = upHeap newTree (directionsTowardLastNode newTree)
 fromList :: (Ord a) => [a] -> BinaryHeapTree a
 fromList = foldl (flip (..>)) Empty
 
---pop :: (Ord a) => BinaryHeapTree a -> (a, BinaryHeapTree a)
---pop tree@(Node n lh rh) = (n, newTree)
---    where 
---        newTree = downHeap $ (Node (node . lastNode $ tree) lh rh)
+pop :: (Ord a) => BinaryHeapTree a -> (a, BinaryHeapTree a)
+pop Empty                     = error "cannot pop from empty tree"
+pop      (Node n Empty Empty) = (n, Empty)
+pop tree@(Node n _ _)         = (n, downHeap newTree)
+    where 
+        newTree = let (e, t) = popLastNode tree
+                  in Node e (left t) (right t)
 
--- popLastNode‚ª•K—v‚¶‚á‚È‚¢‚©H
+popAll :: (Ord a) => BinaryHeapTree a -> [a]
+popAll Empty = []
+popAll tree  = let (e, newTree) = pop tree in e: popAll newTree
+
+heapSort :: (Ord a) => [a] -> [a]
+heapSort = popAll . fromList
 
 --
 putAtLast :: (Eq a) => a -> BinaryHeapTree a -> BinaryHeapTree a
@@ -69,6 +72,18 @@ putAtLast d tree@(Node n lh rh)
     | isSaturated tree  = Node n     (putAtLast d lh)                  rh 
     | isSaturated lh    = Node n                  lh      (putAtLast d rh)
     | otherwise         = Node n     (putAtLast d lh)                  rh 
+
+popLastNode :: (Eq a) => BinaryHeapTree a -> (a, BinaryHeapTree a)
+popLastNode Empty = error "cannot pop from empty tree"
+popLastNode tree = follow tree (directionsTowardLastNode tree) 
+    where
+        follow :: (Eq a) => BinaryHeapTree a -> [Direction] -> (a, BinaryHeapTree a)
+        follow (Node n Empty Empty) [] = (n, Empty)
+        follow (Node n lh rh) (LeftDir :ds) 
+            = let (e, newLh) = follow lh ds in (e, Node n newLh rh)
+        follow (Node n lh rh) (RightDir:ds) 
+            = let (e, newRh) = follow rh ds in (e, Node n lh newRh)
+        follow _ _ = error "illegal directions"
 
 upHeap :: (Ord a) => BinaryHeapTree a -> [Direction] -> BinaryHeapTree a
 upHeap tree@(Node _ Empty Empty) [] = tree 
@@ -81,16 +96,23 @@ upHeap (Node n lh rh) (RightDir:ds)
 upHeap _ _ = error "illegal op"
 
 downHeap :: (Ord a) => BinaryHeapTree a -> BinaryHeapTree a
-downHeap tree@(Node n lh rh)
-    | lh == Empty = tree
-    | node lh < n = Node (node lh) (downHeap newLh)              rh 
-    | rh == Empty = tree
-    | node rh < n = Node (node rh)              lh  (downHeap newRh) 
-    | otherwise   = tree
+downHeap Empty                 = Empty
+downHeap tree@(Node _ Empty _) = tree
+downHeap tree@(Node n lh Empty)
+    | node lh < n   = Node (node lh) newLh Empty
+    | otherwise     = tree
     where
         newLh = Node n (left lh) (right lh)
+downHeap tree@(Node n lh rh)
+    | lhn <= rhn && lhn < n = Node lhn (downHeap newLh) rh
+    | rhn <= lhn && rhn < n = Node rhn lh (downHeap newRh)
+    | otherwise             = tree
+    where
+        lhn = node lh
+        rhn = node rh
+        newLh = Node n (left lh) (right lh)
         newRh = Node n (left rh) (right rh)
-
+        
 
 --
 toStr :: (Show a) => Int -> BinaryHeapTree a -> String
@@ -110,3 +132,4 @@ indent n = join "" (replicate n "    ")
         join _ [ ]        = ""
         join _ [x]        = x
         join sep (x:y:zs) = x ++ sep ++ join sep (y:zs) 
+
