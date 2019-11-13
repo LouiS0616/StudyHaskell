@@ -25,12 +25,19 @@ unlines' = join' '\n'
 
 
 --
+accumulate' :: (Num a) => [a] -> [a]
+accumulate' = scanl1 (+)
+
+--
 main :: IO()
 main = do
     let
         str1 = "spam ham egg"
         str2 = "spam\nham\negg\n"
 
+        arr = [3, 1, 4, 1, 5, 9, 2] :: [Int]
+
     print $ unwords' $ words' str1
     print $ unlines' $ lines' str2
 
+    print $ accumulate' arr
